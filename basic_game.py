@@ -22,13 +22,33 @@ class Game:
 
     def run_game_loop(self):
         is_game_over = False
+        direction = 0
+        player_character = PlayerChar('player.png', 375, 700, 50, 50)
+
         while not is_game_over:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     is_game_over = True
-                print(event)
+                # Detect when key is pressed
+                elif event.type == pygame.KEYDOWN:
+                    # Move up
+                    if event.key == pygame.K_UP:
+                        direction = 1
+                    # Move down
+                    elif event.key == pygame.K_DOWN:
+                        direction = -1
+                # Stop moving on release of key
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                        direction = 0
+                # print(event)
 
+            # Redraw screen
+            self.screen.fill(white)
+            # Move and redraw the character
+            player_character.move(direction)
+            player_character.draw(self.screen)
 
             pygame.display.update()
             clock.tick(self.TICK_RATE)
@@ -38,15 +58,31 @@ class Game:
 
 class GameObject:
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, image_path, x, y, width, height):
         object_image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(object_image, (width, height))
 
         self.x_pos = x
         self.y_pos = y
 
+        self.width = width
+        self.height = height
+
     def draw(self, background):
         background.blit(self.image, (self.x_pos, self.y_pos))
+
+class PlayerChar(GameObject):
+
+    SPEED = 10
+
+    def __init__(self, image_path, x, y, width, height):
+        super().__init__(image_path, x, y, width, height)
+
+    def move(self, direction):
+        if direction > 0:
+            self.y_pos -= self.SPEED
+        elif direction < 0:
+            self.y_pos += self.SPEED
 
 
 pygame.init()
