@@ -24,6 +24,7 @@ class Game:
         is_game_over = False
         direction = 0
         player_character = PlayerChar('player.png', 375, 700, 50, 50)
+        enemy_0 = EnemyChar('enemy.png', 20, 400, 50, 50)
 
         while not is_game_over:
 
@@ -46,8 +47,12 @@ class Game:
 
             # Redraw screen
             self.screen.fill(white)
+            # Move enemy left to right
+            enemy_0.move(self.width)
+            enemy_0.draw(self.screen)
+
             # Move and redraw the character
-            player_character.move(direction)
+            player_character.move(direction, self.height)
             player_character.draw(self.screen)
 
             pygame.display.update()
@@ -78,12 +83,27 @@ class PlayerChar(GameObject):
     def __init__(self, image_path, x, y, width, height):
         super().__init__(image_path, x, y, width, height)
 
-    def move(self, direction):
+    def move(self, direction, max_height):
         if direction > 0:
             self.y_pos -= self.SPEED
         elif direction < 0:
             self.y_pos += self.SPEED
+        if self.y_pos >= max_height - 20:
+            self.y_pos = max_height - 20
 
+class EnemyChar(GameObject):
+
+    SPEED = 10
+
+    def __init__(self, image_path, x, y, width, height):
+        super().__init__(image_path, x, y, width, height)
+
+    def move(self, max_width):
+        if self.x_pos <= 20:
+            self.SPEED = abs(self.SPEED)
+        elif self.x_pos >= max_width - 40:
+            self.SPEED = -abs(self.SPEED)
+        self.x_pos += self.SPEED
 
 pygame.init()
 
